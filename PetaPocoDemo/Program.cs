@@ -46,6 +46,8 @@ namespace PetaPocoDemo
             Console.WriteLine($"Newest: {repo.Find(newContact.Id).FirstName}, Addresses: {repo.GetFullContact(newContact.Id).Addresses.Count}");
             Console.WriteLine($"Total contacts: {repo.GetAll().Count}");
             Console.WriteLine($"Page of contacts: {repo.GetAllPaged(2, 2).Items.Count}");
+            Console.WriteLine("Specific query example: Title = Supreme Pizza and LastName = Martin");
+            Console.WriteLine(repo.GetByLastNameAndTitle("Martin", "Supreme Pizza").First().FirstName);
             repo.Remove(newContact.Id);
             Console.WriteLine($"Remaining contacts: {repo.GetAll().Count}");
         }

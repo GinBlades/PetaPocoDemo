@@ -52,12 +52,13 @@ namespace PetaPocoDemo.Repositories
                 if (contact.IsNew)
                 {
                     Add(contact);
-                } else
+                }
+                else
                 {
                     Update(contact);
                 }
 
-                foreach(var addr in contact.Addresses.Where(a => !a.IsDeleted))
+                foreach (var addr in contact.Addresses.Where(a => !a.IsDeleted))
                 {
                     addr.ContactId = contact.Id;
                     // Save performs the 'if' statement to determine whether Add or Update should be used.
@@ -65,7 +66,7 @@ namespace PetaPocoDemo.Repositories
                     _db.Save(addr);
                 }
 
-                foreach(var addr in contact.Addresses.Where(a => a.IsDeleted))
+                foreach (var addr in contact.Addresses.Where(a => a.IsDeleted))
                 {
                     _db.Delete<Address>(addr.Id);
                 }
@@ -90,6 +91,34 @@ namespace PetaPocoDemo.Repositories
             }
 
             return contact;
+        }
+
+        public List<Contact> GetByLastNameAndTitle(string lastName, string title)
+        {
+            // Option 1
+            //var sql = Sql.Builder
+            //    .Append("WHERE LastName = @0", lastName)
+            //    .Append("AND Title = @0", title);
+
+            // Option 2
+            //var sql = Sql.Builder
+            //    .Append("WHERE LastName = @0", lastName);
+
+            //if (!string.IsNullOrEmpty(title))
+            //{
+            //    sql.Append("AND Title = @0", title);
+            //}
+
+            var sql = Sql.Builder
+                .Append("WHERE LastName = @lastName AND Title = @title",
+                    new { lastName = lastName, title = title });
+
+            var contacts = _db.Query<Contact>(sql).ToList();
+
+            // Command Tracking options:
+            Console.WriteLine(_db.LastCommand);
+
+            return contacts;
         }
     }
 }
