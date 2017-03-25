@@ -20,7 +20,7 @@ namespace PetaPocoDemo.Models
         public string Title { get; set; }
 
         [Ignore]
-        public List<Address> Addresses { get; set; }
+        public List<Address> Addresses { get; set; } = new List<Address>();
 
         [Ignore]
         public bool IsNew {

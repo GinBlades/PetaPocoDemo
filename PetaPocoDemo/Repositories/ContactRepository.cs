@@ -42,5 +42,26 @@ namespace PetaPocoDemo.Repositories
             // You can also pass in a full object
             _db.Delete<Contact>(id);
         }
+
+        public void Save(Contact newContact)
+        {
+            //using (var txScope = new TransactionScope())
+            //{
+
+            //}
+        }
+
+        public Contact GetFullContact(int id)
+        {
+            var contact = Find(id);
+            var addresses = _db.Query<Address>("WHERE ContactId = @0", id).ToList();
+
+            if (contact != null && addresses != null)
+            {
+                contact.Addresses.AddRange(addresses);
+            }
+
+            return contact;
+        }
     }
 }
