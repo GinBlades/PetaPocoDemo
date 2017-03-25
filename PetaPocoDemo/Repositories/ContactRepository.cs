@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace PetaPocoDemo.Repositories
 {
@@ -43,12 +44,39 @@ namespace PetaPocoDemo.Repositories
             _db.Delete<Contact>(id);
         }
 
-        public void Save(Contact newContact)
+        // Use 'Add Reference' to add the 'System.Transactions' namespace for 'TransactionScope'
+        public void Save(Contact contact)
         {
-            //using (var txScope = new TransactionScope())
-            //{
+            using (var txScope = new TransactionScope())
+            {
+                if (contact.IsNew)
+                {
+                    Add(contact);
+                } else
+                {
+                    Update(contact);
+                }
 
-            //}
+                foreach(var addr in contact.Addresses.Where(a => !a.IsDeleted))
+                {
+                    addr.ContactId = contact.Id;
+                    // Save performs the 'if' statement to determine whether Add or Update should be used.
+                    // This makes an additional query to the database.
+                    _db.Save(addr);
+                }
+
+                foreach(var addr in contact.Addresses.Where(a => a.IsDeleted))
+                {
+                    _db.Delete<Address>(addr.Id);
+                }
+                txScope.Complete();
+            }
+        }
+
+        internal Page<Contact> GetAllPaged(int page, int size)
+        {
+            // You can pass additional 'WHERE' clauses to this.
+            return _db.Page<Contact>(page, size, "");
         }
 
         public Contact GetFullContact(int id)
